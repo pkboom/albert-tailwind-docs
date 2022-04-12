@@ -27,8 +27,6 @@ order by
     END ASC
 limit 10
 """
-        print(sql.format(search = query.string))
-
         mydb = mysql.connector.connect(user='root', password='', host='127.0.0.1', database='docs')
         mycursor = mydb.cursor()
         mycursor.execute(sql.format(search = query.string))
