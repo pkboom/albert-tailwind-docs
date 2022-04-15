@@ -17,15 +17,10 @@ def handleQuery(query):
 
     if query.string.strip():
         sql="""
-select page, heading, body, id from tailwind_docs 
+select page, anchor, heading, body, id from tailwind_docs 
 where heading like '%{search}%'
-or body like '%{search}%'
-order by 
-    CASE 
-        WHEN heading LIKE '%{search}%' THEN 0 
-        ELSE 1 
-    END ASC
-limit 10
+or match (body) against ('{search}' in natural language mode) 
+limit 30
 """
         mydb = mysql.connector.connect(user='root', password='', host='127.0.0.1', database='docs')
         mycursor = mydb.cursor()
@@ -34,24 +29,30 @@ limit 10
         mydb.close()
 
         for result in results:
-            url = 'https://tailwindcss.com/docs/{page}'.format(page = result[0])
+            url = 'https://tailwindcss.com/docs/{page}{anchor}'.format(page = result[0], anchor = '#'+result[1] if result[1] else '')
 
             excerpt = ''
 
-            print(result[1])
-            print(result[2])
+            if len(result[3]) > 0 and query.string.lower() not in result[3].lower():
+                continue
+
+            if query.string.lower() in result[3].lower() if result[3] else '': 
+                start = result[3].lower().find(query.string.lower())
+                bodyLength = len(result[3])
+
+                find = result[3][0 if start < 40 else start - 40: bodyLength if start + len(query.string) + 40 > bodyLength else start + len(query.string) + 40]
+                excerpt = ('' if start < 40 else '...') + find + ('' if start + len(query.string) + 40 > bodyLength else '...')
 
             items.append(Item(
-                id=str(result[3]),
+                id=str(result[4]),
                 icon=icon,
-                text = result[1],
-                subtext= result[2],
+                text = result[2],
+                subtext= excerpt if excerpt else '',
                 actions=[UrlAction(
                     text="This action opens tailwind docs.", 
                     url=url
                 )],
             ))
-
     else:
         items.append(Item(
             icon=icon,
