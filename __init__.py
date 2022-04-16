@@ -20,7 +20,6 @@ def handleQuery(query):
 select page, anchor, heading, body, id from tailwind_docs 
 where heading like '%{search}%'
 or match (body) against ('{search}' in natural language mode) 
-limit 30
 """
         mydb = mysql.connector.connect(user='root', password='', host='127.0.0.1', database='docs')
         mycursor = mydb.cursor()
@@ -33,7 +32,13 @@ limit 30
 
             excerpt = ''
 
-            if len(result[3]) > 0 and query.string.lower() not in result[3].lower():
+            print('================================================')
+            print(result[2])
+            print(result[3])
+            print(query.string.lower() not in result[2].lower())
+            print(len(result[3]) > 0 and query.string.lower() not in result[3].lower())
+
+            if (query.string.lower() not in result[2].lower() and len(result[3]) > 0 and query.string.lower() not in result[3].lower()):
                 continue
 
             if query.string.lower() in result[3].lower() if result[3] else '': 
