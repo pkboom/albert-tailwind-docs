@@ -17,7 +17,7 @@ def handleQuery(query):
 
     if query.string.strip():
         sql="""
-select page, anchor, heading, body, id from tailwind_docs 
+select page, anchor, heading, body, id, page_heading  from tailwind_docs 
 where heading like '%{search}%'
 or match (body) against ('{search}' in natural language mode) 
 """
@@ -46,7 +46,7 @@ or match (body) against ('{search}' in natural language mode)
                 bodyLength = len(result[3])
 
                 find = result[3][0 if start < 40 else start - 40: bodyLength if start + len(query.string) + 40 > bodyLength else start + len(query.string) + 40]
-                excerpt = ('' if start < 40 else '...') + find + ('' if start + len(query.string) + 40 > bodyLength else '...')
+                excerpt = result[5] + ('' if start < 40 else '...') + find + ('' if start + len(query.string) + 40 > bodyLength else '...')
 
             items.append(Item(
                 id=str(result[4]),
