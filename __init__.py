@@ -23,7 +23,8 @@ where heading like '%{search}%'
 or match (body) against ('{search}' in natural language mode) 
 """
         mydb = mysql.connector.connect(
-            user='root', password='', host='127.0.0.1', database='docs')
+            user='root', password='', host='127.0.0.1', database='docs'
+        )
         mycursor = mydb.cursor()
         mycursor.execute(sql.format(search=query.string))
         results = mycursor.fetchall()
@@ -31,7 +32,8 @@ or match (body) against ('{search}' in natural language mode)
 
         for result in results:
             url = 'https://tailwindcss.com/docs/{page}{anchor}'.format(
-                page=result[0], anchor='#'+result[1] if result[1] else '')
+                page=result[0], anchor='#'+result[1] if result[1] else ''
+            )
 
             excerpt = ''
 
